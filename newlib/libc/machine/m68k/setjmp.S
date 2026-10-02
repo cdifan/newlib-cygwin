@@ -1,10 +1,21 @@
 #include "m68kasm.h"
 
+/* Where the arguments are: on the stack, or with -mos9call (the OS-9
+   calling convention of the m68k-elfos9 GCC) the first in d0 and the
+   second in d1.  */
+#ifdef __OS9CALL__
+#define GET_ENV moveal d0,a0
+#define GET_VAL movel d1,d0
+#else
+#define GET_ENV moveal sp@(4),a0
+#define GET_VAL movel sp@(8),d0
+#endif
+
 .global SYM (setjmp)
 .global SYM (longjmp)
 
 SYM (setjmp):
-	moveal sp@(4),a0
+	GET_ENV
 	movel sp@(0),a0@(12)
 	movel sp,a0@(8)
 	moveml d2-d7/a2-a6,a0@(20)
@@ -12,8 +23,8 @@ SYM (setjmp):
 	rts
 
 SYM (longjmp):
-	moveal sp@(4),a0
-	movel sp@(8),d0
+	GET_ENV
+	GET_VAL
 	bne 1f
 	movel &1,d0
 1:
@@ -27,7 +38,7 @@ SYM (longjmp):
 .global SYM (longjmp_68881)
 
 SYM (setjmp_68881):
-	moveal sp@(4),a0
+	GET_ENV
 	movel sp@(0),a0@(12)
 	movel sp,a0@(8)
 	moveml d2-d7/a2-a6,a0@(20)
@@ -36,9 +47,9 @@ SYM (setjmp_68881):
 	rts
 
 SYM (longjmp_68881):
-	moveal sp@(4),a0
+	GET_ENV
 	fmovemx a0@(64),fp2-fp7
-	movel sp@(8),d0
+	GET_VAL
 	bne 1f
 	movel &1,d0
 1:
