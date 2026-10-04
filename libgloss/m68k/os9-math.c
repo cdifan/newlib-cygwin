@@ -292,9 +292,11 @@ __extendsfdf2 (float a)
 }
 
 /* Links the math trap handler before main (constructors run first); a
-   program that can't have it stops, as Microware's cstart.r does.  */
-static void __attribute__ ((constructor (101)))
-link_math (void)
+   program that can't have it stops, as Microware's cstart.r does.  Global:
+   -mos9math links it (-u) also into programs that use only the inline
+   functions of machine/os9math.h, which call nothing here.  */
+void __attribute__ ((constructor (101)))
+__os9_math_link (void)
 {
   static const char name[] = "math";
   static const char message[] = "**** Can't install math trap handler ****\r";

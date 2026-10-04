@@ -620,4 +620,9 @@ _END_STD_C
 #include <machine/fastmath.h>
 #endif
 
+/* m68k-elfos9-gcc -mos9math: functions OS-9's math module has, inline.  */
+#ifdef __OS9MATH__
+#include <machine/os9math.h>
+#endif
+
 #endif /* _MATH_H_ */
