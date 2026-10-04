@@ -55,11 +55,13 @@ SECTIONS {
         KEEP (*(.preinit_array))
         PROVIDE_HIDDEN (__preinit_array_end = .);
         PROVIDE_HIDDEN (__init_array_start = .);
-        KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*)))
+        /* GCC puts constructors (with a priority: .ctors.N) in .ctors
+           here; newlib runs them from __libc_init_array, in this order.  */
+        KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
         KEEP (*(.init_array .ctors))
         PROVIDE_HIDDEN (__init_array_end = .);
         PROVIDE_HIDDEN (__fini_array_start = .);
-        KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*)))
+        KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
         KEEP (*(.fini_array .dtors))
         PROVIDE_HIDDEN (__fini_array_end = .);
         . = ALIGN(2);

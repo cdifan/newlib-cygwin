@@ -69,13 +69,17 @@ OBJS =  close.o fstat.o getpid.o isatty.o kill.o \
 # OS-9/68K (m68k-elfos9): a startup, newlib's system calls through OS-9
 # system calls, a linker script and a specs file, for programs made into
 # OS-9 modules by elf2mod:  m68k-elfos9-gcc -specs=os9.specs ...
+# libos9math: the soft-float routines through OS-9's math module, linked
+# before libgcc by m68k-elfos9-gcc -mos9math.
 # Its code is always position-independent and a6-relative, as on OS-9.
 OS9_CRT0	= os9-crt0.o
 OS9_BSP		= libos9.a
 OS9_OBJS	= os9-start.o os9-io.o os9-proc.o
+OS9_MATH	= libos9math.a
+OS9_MATH_OBJS	= os9-math.o
 OS9_CFLAGS	= -mpcrel -ma6rel
 ifneq (,$(findstring elfos9,$(target_alias)))
-OS9_ALL		= $(OS9_CRT0) $(OS9_BSP)
+OS9_ALL		= $(OS9_CRT0) $(OS9_BSP) $(OS9_MATH)
 OS9_INSTALL	= install_os9
 endif
 
@@ -234,6 +238,13 @@ ${SIM_BSP}: ${SIM_OBJS}
 ${OS9_BSP}: ${OS9_OBJS}
 	${AR} ${ARFLAGS} $@ ${OS9_OBJS}
 	${RANLIB} $@
+
+${OS9_MATH}: ${OS9_MATH_OBJS}
+	${AR} ${ARFLAGS} $@ ${OS9_MATH_OBJS}
+	${RANLIB} $@
+
+os9-math.o: os9-math.c os9-sys.h
+	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $(OS9_CFLAGS) $<
 
 os9-crt0.o: os9-crt0.S
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $(OS9_CFLAGS) -c $<
@@ -438,7 +449,7 @@ install_m68k:: $(OS9_INSTALL)
 
 .PHONY: install_os9
 install_os9:
-	$(INSTALL_DATA) $(OS9_CRT0) $(OS9_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) $(OS9_CRT0) $(OS9_BSP) $(OS9_MATH) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) ${srcdir}/os9.ld ${srcdir}/os9.specs $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 .PHONY:install_m68k
