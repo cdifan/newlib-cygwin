@@ -41,6 +41,13 @@ SECTIONS {
         *(.text .text.* .rodata .rodata.*)
         . = ALIGN(2);
     }
+    /* The symbols Microware's linker defines for the module's start, name
+       and end, which Microware's libraries use (clib's _errmsg, cio):
+       elf2mod sets every reference to them, so these values are only
+       placeholders.  */
+    PROVIDE (btext = ADDR(.text)); PROVIDE (_btext = ADDR(.text));
+    PROVIDE (bname = ADDR(.text)); PROVIDE (_bname = ADDR(.text));
+    PROVIDE (etext = ADDR(.text)); PROVIDE (_etext = ADDR(.text));
 
     . = -0x8000;
     .bss (NOLOAD) : {
