@@ -66,6 +66,19 @@ OBJS =  close.o fstat.o getpid.o isatty.o kill.o \
 	lseek.o open.o print.o putnum.o read.o sbrk.o stat.o \
 	unlink.o write.o
 
+# OS-9/68K (m68k-elfos9): a startup, newlib's system calls through OS-9
+# system calls, a linker script and a specs file, for programs made into
+# OS-9 modules by elf2mod:  m68k-elfos9-gcc -specs=os9.specs ...
+# Its code is always position-independent and a6-relative, as on OS-9.
+OS9_CRT0	= os9-crt0.o
+OS9_BSP		= libos9.a
+OS9_OBJS	= os9-start.o os9-io.o os9-proc.o
+OS9_CFLAGS	= -mpcrel -ma6rel
+ifneq (,$(findstring elfos9,$(target_alias)))
+OS9_ALL		= $(OS9_CRT0) $(OS9_BSP)
+OS9_INSTALL	= install_os9
+endif
+
 # What targets to build for.  This is a list of {m68k,cf}
 DO = @DO@
 
@@ -206,7 +219,7 @@ all :: $(DO:%=all_%)
 
 .PHONY: all_m68k
 all_m68k :: ${SIM_CRT0} ${SIM_BSP} ${CRT0} ${BCC_BSP} ${IDP_BSP} \
-	${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP}
+	${IDPGDB_BSP} ${MVME135_BSP} ${MVME162_BSP} ${OS9_ALL}
 .PHONY: all_cf
 all_cf :: ${CF_CRT0S} ${CF_BSP} ${CF_SCRIPTS} ${HOSTED_BSP} ${UNHOSTED_BSP}
 
@@ -217,6 +230,19 @@ all_fido :: ${FIDO_CRT0S} ${FIDO_BSP} ${FIDO_SCRIPTS} \
 ${SIM_BSP}: ${SIM_OBJS}
 	${AR} ${ARFLAGS} $@ ${SIM_OBJS}
 	${RANLIB} $@
+
+${OS9_BSP}: ${OS9_OBJS}
+	${AR} ${ARFLAGS} $@ ${OS9_OBJS}
+	${RANLIB} $@
+
+os9-crt0.o: os9-crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $(OS9_CFLAGS) -c $<
+os9-start.o: os9-start.c
+	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $(OS9_CFLAGS) $<
+os9-io.o: os9-io.c os9-sys.h
+	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $(OS9_CFLAGS) $<
+os9-proc.o: os9-proc.c os9-sys.h
+	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $(OS9_CFLAGS) $<
 
 ${BCC_BSP}: $(OBJS) ${BCC_OBJS}
 	${AR} ${ARFLAGS} $@ $(OBJS) ${BCC_OBJS}
@@ -406,6 +432,14 @@ unlink.o: $(srcdir)/../unlink.c
 .PHONY: install info dvi doc install-info clean-info
 install:: $(DO:%=install_%)
 
+
+install_m68k:: $(OS9_INSTALL)
+	@:
+
+.PHONY: install_os9
+install_os9:
+	$(INSTALL_DATA) $(OS9_CRT0) $(OS9_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	$(INSTALL_DATA) ${srcdir}/os9.ld ${srcdir}/os9.specs $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 
 .PHONY:install_m68k
 install_m68k::

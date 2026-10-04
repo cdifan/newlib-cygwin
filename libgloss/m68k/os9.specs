@@ -1,0 +1,19 @@
+%rename cc1 os9_cc1
+%rename link os9_link
+%rename lib os9_lib
+
+*cc1:
+%(os9_cc1) %{!mno-pcrel:-mpcrel} -ma6rel
+
+*startfile:
+os9-crt0%O%s
+
+*endfile:
+
+
+*link:
+%(os9_link) -q --no-check-sections %{!T*:-Tos9.ld}
+
+*lib:
+--start-group %(os9_lib) -los9 --end-group
+
