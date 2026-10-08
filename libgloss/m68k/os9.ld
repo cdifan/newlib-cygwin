@@ -19,7 +19,7 @@ ENTRY(_start)
 
 /* A reentrant program module in object code, revision 1, edition 1, with
    8 KB of stack.  */
-PROVIDE (__os9_tylan = 0x0101);
+PROVIDE (__os9_typelang = 0x0101);
 PROVIDE (__os9_attrev = 0x8001);
 PROVIDE (__os9_edition = 1);
 PROVIDE (__os9_stack = 0x2000);
