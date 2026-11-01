@@ -32,6 +32,11 @@ __RCSID("$NetBSD: cprojl.c,v 1.7 2014/10/10 00:48:18 christos Exp $");
 #include <math.h>
 
 #include "../common/fdlibm.h"
+#include <newlib.h>
+
+/* The long double functions this needs (cosl, expl, logl, ...) exist only
+   where long double is double; math.h declares them only then.  */
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 
 /*
  * cprojl(long double complex z)
@@ -62,3 +67,5 @@ cprojl(long double complex z)
 
 	return (w.z);
 }
+
+#endif /* _LDBL_EQ_DBL || __CYGWIN__ */

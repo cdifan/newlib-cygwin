@@ -35,6 +35,11 @@ __RCSID("$NetBSD: csqrtl.c,v 1.2 2014/10/11 00:43:51 christos Exp $");
 #include <float.h>
 #include <math.h>
 #include <stdbool.h>
+#include <newlib.h>
+
+/* The long double functions this needs (cosl, expl, logl, ...) exist only
+   where long double is double; math.h declares them only then.  */
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 /*
  * gcc doesn't implement complex multiplication or division correctly,
  * so we need to handle infinities specially. We turn on this pragma to
@@ -110,3 +115,5 @@ csqrtl(long double complex z)
 	else
 		return (result);
 }
+
+#endif /* _LDBL_EQ_DBL || __CYGWIN__ */

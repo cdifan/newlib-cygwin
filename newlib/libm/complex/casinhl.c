@@ -30,6 +30,11 @@
  */
 
 #include <complex.h>
+#include <newlib.h>
+
+/* The long double functions this needs (cosl, expl, logl, ...) exist only
+   where long double is double; math.h declares them only then.  */
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 
 long double complex
 casinhl(long double complex z)
@@ -39,3 +44,5 @@ casinhl(long double complex z)
 	w = -1.0L * I * casinl(z * I);
 	return w;
 }
+
+#endif /* _LDBL_EQ_DBL || __CYGWIN__ */

@@ -33,6 +33,11 @@
 #include <complex.h>
 #include <math.h>
 #include "cephes_subrl.h"
+#include <newlib.h>
+
+/* The long double functions this needs (cosl, expl, logl, ...) exist only
+   where long double is double; math.h declares them only then.  */
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 
 long double complex
 ctanl(long double complex z)
@@ -54,3 +59,5 @@ ctanl(long double complex z)
 	w = sinl(2.0L * creall(z)) / d + (sinhl(2.0L * cimagl(z)) / d) * I;
 	return w;
 }
+
+#endif /* _LDBL_EQ_DBL || __CYGWIN__ */

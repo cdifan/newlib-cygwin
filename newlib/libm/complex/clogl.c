@@ -31,6 +31,11 @@
 
 #include <complex.h>
 #include <math.h>
+#include <newlib.h>
+
+/* The long double functions this needs (cosl, expl, logl, ...) exist only
+   where long double is double; math.h declares them only then.  */
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 
 long double complex
 clogl(long double complex z)
@@ -44,3 +49,5 @@ clogl(long double complex z)
 	w = p + rr * I;
 	return w;
 }
+
+#endif /* _LDBL_EQ_DBL || __CYGWIN__ */
