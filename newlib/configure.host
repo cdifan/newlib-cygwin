@@ -810,7 +810,9 @@ newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVID
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DABORT_PROVIDED -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	;;
   m68k-unknown-elfos9)
-	# no rename, no system
+	# no rename, no system; the _<systemcall> prototypes for the reentrant
+	# wrappers in libc/reent
+	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
 	syscall_dir=syscalls
 	;;
   m68k-unknown-elf*)
