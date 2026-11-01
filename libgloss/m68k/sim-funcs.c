@@ -14,6 +14,7 @@
  */
 
 #define _XOPEN_SOURCE
+#include <stdlib.h>
 #include <unistd.h>
 
 int

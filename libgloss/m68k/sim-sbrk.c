@@ -15,6 +15,7 @@
  */
 
 extern char _end[];
+extern int brk (void *);	/* not in unistd.h, whose sbrk differs from this one */
 static char *curbrk = _end;
 
 char *
